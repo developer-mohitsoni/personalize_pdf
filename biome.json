@@ -30,7 +30,8 @@
         "noDoubleEquals": "error",
         "noDebugger": "error",
         "noConsole": "off",
-        "noExplicitAny": "off"
+        "noExplicitAny": "off",
+        "noControlCharactersInRegex": "off"
       },
       "complexity": {
         "noUselessCatch": "error",
