@@ -1,3 +1,4 @@
+import FileUpload from "@/components/FileUpload";
 import { Button } from "@/components/ui/button";
 import { UserButton } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
@@ -31,15 +32,7 @@ export default async function Home() {
 							</Link>
 						</Button>
 
-						<div className="rounded-xl border bg-white/70 p-4 shadow-sm backdrop-blur-md">
-							<h2 className="font-semibold text-gray-700 text-xl">
-								Upload your PDF to get started
-							</h2>
-							{/* Replace below with your actual uploader */}
-							<div className="mt-2 text-gray-500 text-sm italic">
-								[PDF Upload Component]
-							</div>
-						</div>
+						<FileUpload /> 
 					</div>
 				) : (
 					<Button
