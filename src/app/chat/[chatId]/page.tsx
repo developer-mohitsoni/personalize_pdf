@@ -1,17 +1,21 @@
 import ChatSideBar from "@/components/ChatSideBar";
+import PDFViewer from "@/components/PDFViewer";
 import { db } from "@/lib/db";
 import { chats } from "@/lib/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 
-type Props = {
+interface Props {
 	params: {
 		chatId: string;
 	};
-};
+}
 
-const ChatPdf = async ({ params: { chatId } }: Props) => {
+const ChatPdf = async (props: Props) => {
+	const { params } = props;
+	const { chatId } = params;
+
 	const { userId } = await auth();
 
 	if (!userId) return redirect("/sign-in");
@@ -19,6 +23,10 @@ const ChatPdf = async ({ params: { chatId } }: Props) => {
 	const _chats = await db.select().from(chats).where(eq(chats.userId, userId));
 	if (!_chats || !_chats.find((chat) => chat.id === Number(chatId)))
 		return redirect("/");
+
+	const currentChat = _chats.find(
+		(chat) => chat.id === Number.parseInt(chatId)
+	);
 
 	return (
 		<div className="flex h-screen overflow-hidden">
@@ -30,8 +38,7 @@ const ChatPdf = async ({ params: { chatId } }: Props) => {
 			{/* PDF Viewer */}
 			<main className="flex-1 overflow-y-auto bg-white p-6">
 				<div className="flex h-full items-center justify-center rounded-xl border bg-gray-50 text-gray-400 text-xl shadow-inner">
-					{/* Replace with actual PDF Viewer */}
-					PDF Viewer Placeholder
+					<PDFViewer pdf_url={currentChat?.pdfUrl || ""} />
 				</div>
 			</main>
 
