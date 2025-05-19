@@ -1,3 +1,4 @@
+import ChatComponent from "@/components/ChatComponent";
 import ChatSideBar from "@/components/ChatSideBar";
 import PDFViewer from "@/components/PDFViewer";
 import { db } from "@/lib/db";
@@ -45,8 +46,7 @@ const ChatPdf = async (props: Props) => {
 			{/* Chat Component */}
 			<aside className="w-[28rem] border-l bg-white">
 				<div className="p-4 text-gray-700">
-					{/* Replace with actual Chat UI */}
-					Chat Component Placeholder
+					<ChatComponent />
 				</div>
 			</aside>
 		</div>
