@@ -12,28 +12,18 @@ const MessageList = ({ messages, scrollRef }: Props) => {
 	if (!messages) return null;
 
 	return (
-		<div className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
-			{messages.map((m, i) => (
+		<div className="flex flex-col gap-4 p-4">
+			{messages.map((msg, idx) => (
 				<div
 					// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-					key={i}
-					className={`flex ${
-						m.role === "user" ? "justify-end" : "justify-start"
-					}`}
+					key={idx}
+					className={`max-w-[75%] whitespace-pre-wrap rounded-xl px-4 py-3 text-sm shadow${msg.role === "user" ? "self-end bg-blue-600 text-white" : "self-start bg-gray-100 text-gray-800"}`}
+					style={{
+						maxHeight: "300px", // 🔥 control height
+						overflowY: "auto" // 🔥 allow scroll inside
+					}}
 				>
-					<div
-						className={`break-words rounded-xl px-4 py-2 text-sm shadow-md ${
-							m.role === "user"
-								? "bg-blue-600 text-white"
-								: "bg-gray-200 text-gray-900"
-						}`}
-						style={{
-							maxWidth: "75%",
-							width: "fit-content"
-						}}
-					>
-						{m.content}
-					</div>
+					{msg.content}
 				</div>
 			))}
 			<div ref={scrollRef} />
