@@ -46,7 +46,7 @@ const ChatPdf = async (props: Props) => {
 			{/* Chat Component */}
 			<aside className="w-[28rem] border-l bg-white">
 				<div className="p-4 text-gray-700">
-					<ChatComponent />
+					<ChatComponent chatId={Number.parseInt(chatId)} />
 				</div>
 			</aside>
 		</div>
