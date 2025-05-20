@@ -1,6 +1,9 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
+import { useQuery } from "@tanstack/react-query";
+import type { Message } from "ai";
+import axios from "axios";
 import { Send } from "lucide-react";
 import { useEffect, useRef } from "react";
 import MessageList from "./MessageList";
@@ -12,11 +15,22 @@ type Props = {
 };
 
 const ChatComponent = ({ chatId }: Props) => {
+	const { data, isLoading } = useQuery({
+		queryKey: ["chat", chatId],
+		queryFn: async () => {
+			const reponse = await axios.post<Message[]>("/api/get-messages", {
+				chatId
+			});
+
+			return reponse.data;
+		}
+	});
 	const { messages, input, handleInputChange, handleSubmit } = useChat({
 		api: "/api/chat",
 		body: {
 			chatId
-		}
+		},
+		initialMessages: data || []
 	});
 
 	const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -45,7 +59,11 @@ const ChatComponent = ({ chatId }: Props) => {
 
 			{/* Message List */}
 			<div className="flex-1 overflow-y-auto">
-				<MessageList messages={messages} scrollRef={messagesEndRef} />
+				<MessageList
+					messages={messages}
+					scrollRef={messagesEndRef}
+					isLoading={isLoading}
+				/>
 			</div>
 
 			{/* Input */}
