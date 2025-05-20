@@ -17,7 +17,7 @@ const config: PineconeConfiguration = {
 	apiKey: process.env.PINECONE_API_KEY as string
 };
 
-const pc = new Pinecone(config);
+export const pc = new Pinecone(config);
 
 type PDFPage = {
 	pageContent: string;
