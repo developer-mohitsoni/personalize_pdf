@@ -7,9 +7,16 @@ import MessageList from "./MessageList";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 
-const ChatComponent = () => {
+type Props = {
+	chatId: number;
+};
+
+const ChatComponent = ({ chatId }: Props) => {
 	const { messages, input, handleInputChange, handleSubmit } = useChat({
-		api: "/api/chat"
+		api: "/api/chat",
+		body: {
+			chatId
+		}
 	});
 
 	const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -17,20 +24,29 @@ const ChatComponent = () => {
 	// Auto-scroll to bottom when messages update
 	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
-		if (messagesEndRef.current) {
-			messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+		const messageContainer = document.getElementById("message-container");
+		if (messageContainer) {
+			messageContainer.scrollTo({
+				top: messageContainer.scrollHeight,
+				behavior: "smooth"
+			});
 		}
 	}, [messages]);
 
 	return (
-		<div className="flex h-full flex-col border-l bg-white">
+		<div
+			className="flex h-full flex-col border-l bg-white"
+			id="message-container"
+		>
 			{/* Header */}
 			<header className="sticky top-0 z-10 bg-white p-4 shadow-sm">
 				<h3 className="font-semibold text-gray-800 text-xl">AI Assistant</h3>
 			</header>
 
 			{/* Message List */}
-			<MessageList messages={messages} scrollRef={messagesEndRef} />
+			<div className="flex-1 overflow-y-auto">
+				<MessageList messages={messages} scrollRef={messagesEndRef} />
+			</div>
 
 			{/* Input */}
 			<form
