@@ -1,6 +1,6 @@
 import { getContext } from "@/lib/context";
 import { db } from "@/lib/db";
-import { chats } from "@/lib/db/schema";
+import { messages as _messages, chats } from "@/lib/db/schema";
 import { openai } from "@ai-sdk/openai";
 // import type { Message } from "@ai-sdk/react";
 import { type Message, streamText } from "ai";
@@ -28,6 +28,12 @@ export async function POST(req: Request) {
 
 		const lastMessage = messages[messages.length - 1];
 
+		await db.insert(_messages).values({
+			chatId,
+			role: "user",
+			content: lastMessage.content
+		});
+
 		const context = await getContext(lastMessage.content, fileKey);
 
 		const prompt = {
@@ -48,12 +54,25 @@ export async function POST(req: Request) {
 				`
 		};
 
+		// const finalResponse = "";
+
 		const result = await streamText({
 			model: openai("gpt-3.5-turbo"),
 			messages: [
 				prompt,
 				...messages.filter((message: Message) => message.role === "user")
-			]
+			],
+			onFinish: async ({text}) => {
+				// ✅ Save assistant's response after stream completes
+				await db.insert(_messages).values({
+					chatId,
+					role: "system",
+					content: text
+				});
+			},
+			onError: ({ error }) => {
+				console.error("❌ Streaming error:", error);
+			}
 		});
 
 		return result.toDataStreamResponse();
