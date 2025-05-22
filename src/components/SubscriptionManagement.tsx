@@ -51,31 +51,30 @@ const SubscriptionManagement = () => {
 	}
 
 	return (
-		<div className="container mx-auto py-8">
-			<h2 className="mb-4 font-bold text-2xl">Subscription Details</h2>
+		<div className="container mx-auto py-8 font-sans">
+			<h1 className="mb-8 font-semibold text-3xl">Manage Subscription</h1>
 			{subscription ? (
-				<div className="rounded-lg bg-white p-4 shadow-md">
-					<p className="text-gray-700">
+				<div className="rounded-lg border border-gray-200 bg-gray-50 p-6 shadow-md">
+					<h2 className="mb-4 font-semibold text-xl">Subscription Details</h2>
+					<p className="mb-2 text-gray-700">
 						<span className="font-semibold">Status:</span> {subscription.status}
 					</p>
-					<p className="text-gray-700">
+					<p className="mb-2 text-gray-700">
 						<span className="font-semibold">Plan:</span> {subscription.plan_id}
 					</p>
-					<p className="text-gray-700">
+					<p className="mb-2 text-gray-700">
 						<span className="font-semibold">Current Period End:</span>{" "}
 						{subscription.current_end
-							? new Date(
-									subscription.current_end * 1000
-								).toLocaleDateString()
+							? new Date(subscription.current_end * 1000).toLocaleDateString()
 							: "N/A"}
 					</p>
 					<button
 						disabled={loading}
 						onClick={handleCancelSubscription}
 						type="button"
-						className="mt-4 rounded-lg bg-red-500 px-4 py-2 font-bold text-white hover:bg-red-700 disabled:opacity-50"
+						className="mt-4 rounded border border-gray-400 bg-white px-4 py-2 font-semibold text-gray-800 shadow hover:bg-gray-100 disabled:opacity-50"
 					>
-						{loading ? "Cancel Subscription" : "Cancelling..."}
+						{loading ? "Cancelling..." : "Cancel Plan"}
 					</button>
 				</div>
 			) : (
