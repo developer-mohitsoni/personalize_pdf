@@ -40,11 +40,106 @@ export async function GET() {
 			return NextResponse.json({ subscription: null });
 		}
 
-		// Fetch subscription details from Razorpay API
-		const razorpaySubscription = await razorpay.subscriptions.fetch(subscriptionId);
+		const invoices = await razorpay.invoices.all({
+			subscription_id: subscriptionId
+		});
 
-		return NextResponse.json({ subscription: razorpaySubscription });
-	} catch (error) {
+		let paymentId: string | undefined =
+			invoices.items?.[0]?.payment_id ?? undefined;
+
+		if (!paymentId) {
+			// Fallback: find latest successful payment for subscription
+			const payments = await razorpay.payments.all({});
+			let successfulPayment: any;
+			if (payments && typeof payments === "object" && "items" in payments) {
+				successfulPayment = payments.items.find(
+					(p: any) => p.status === "captured"
+				);
+				paymentId = successfulPayment?.id;
+			}
+
+			if (!paymentId) {
+				const payments = await razorpay.payments.all({});
+				let successfulPayment: any;
+
+				if (payments && typeof payments === "object" && "items" in payments) {
+					successfulPayment = payments.items.find((p: any) => {
+						return (
+							p.subscription_id === subscriptionId && p.status === "captured"
+						);
+					});
+					paymentId = successfulPayment?.id;
+				}
+			}
+		}
+
+		let cardDetails = { last4: "N/A", expiry: "N/A" };
+
+		if (invoices.items?.length) {
+			const paymentId = invoices.items[0].payment_id;
+			let payment: any;
+			if (paymentId) {
+				payment = await razorpay.payments.fetch(paymentId);
+				if (payment?.card) {
+					cardDetails = {
+						last4: payment.card.last4,
+						expiry: `${payment.card.expiry_month}/${payment.card.expiry_year}`
+					};
+				}
+			}
+		}
+
+		let razorpaySubscription: any;
+		try {
+			// Fetch subscription details from Razorpay API
+			razorpaySubscription = await razorpay.subscriptions.fetch(subscriptionId);
+		} catch (error: any) {
+			console.error("Error fetching subscription details:", error);
+			return NextResponse.json({ subscription: null });
+		}
+
+		if (!razorpaySubscription) {
+			return NextResponse.json({ subscription: null });
+		}
+
+		let customer: any;
+		try {
+			if (razorpaySubscription.customer_id) {
+				// Fetch customer details from Razorpay API
+				customer = await razorpay.customers.fetch(
+					razorpaySubscription.customer_id
+				);
+			} else {
+				customer = { name: "N/A", email: "N/A" };
+			}
+
+			let plan;
+			try {
+				// Fetch plan details from Razorpay API
+				if (razorpaySubscription.plan_id) {
+					plan = await razorpay.plans.fetch(razorpaySubscription.plan_id);
+
+					return NextResponse.json({
+						subscription: {
+							...razorpaySubscription,
+							customer_details: customer,
+							plan_name: plan?.item?.name,
+							amount: Number(plan?.item?.amount) / 100,
+							currency: plan?.item?.currency,
+							cardDetails
+						}
+					});
+				}
+				return NextResponse.json({ subscription: null });
+			} catch (error: any) {
+				console.error("Error fetching plan details:", error);
+				return NextResponse.json({ subscription: null });
+			}
+		} catch (error: any) {
+			console.error("Error checking subscription status:", error);
+			return new NextResponse(error.message, { status: 500 });
+		}
+	} catch (error: any) {
 		console.error("Error checking subscription status:", error);
 		return new NextResponse("Internal Server Error", { status: 500 });
 	}
