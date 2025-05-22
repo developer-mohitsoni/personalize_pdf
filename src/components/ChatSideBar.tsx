@@ -2,9 +2,12 @@
 
 import type { DrizzleChat } from "@/lib/db/schema";
 import { cn } from "@/lib/utils";
+import axios from "axios";
 import { MessageCircle, PlusCircle } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
+import toast from "react-hot-toast";
 
 type Props = {
 	chats: DrizzleChat[];
@@ -12,6 +15,69 @@ type Props = {
 };
 
 const ChatSideBar = ({ chats, chatId }: Props) => {
+	const [loading, setLoading] = useState(false);
+	// ✅ Razorpay script loader
+	useEffect(() => {
+		const script = document.createElement("script");
+		script.src = "https://checkout.razorpay.com/v1/checkout.js";
+		script.async = true;
+		document.body.appendChild(script);
+		return () => {
+			document.body.removeChild(script);
+		};
+	}, []);
+
+	const handleSubscription = async () => {
+		const response = await axios.post("/api/razorpay");
+		const data = response.data;
+
+		console.log("Data from /api/razorpay:", data);
+
+		try {
+			setLoading(true);
+
+			if (data.status === "active") {
+				window.location.href = data.cancelUrl;
+				return;
+			}
+
+			if (data.subscriptionId) {
+				console.log("data.subscriptionId exists:", data.subscriptionId);
+				// Ensure Razorpay script is loaded
+				if (typeof (window as any).Razorpay === 'undefined') {
+					console.error('Razorpay script not loaded');
+					toast.error('Razorpay script not loaded. Please try again.');
+					return;
+				}
+
+				console.log("Razorpay script loaded");
+
+				const razorpay = new (window as any).Razorpay({
+					key: data.key,
+					subscription_id: data.subscriptionId,
+					name: data.name,
+					prefill: {
+						name: data.name,
+						email: data.email
+					},
+					handler: (response: any) => {
+						// optional: validate payment here or via webhook
+					},
+					theme: { color: "#6366f1" }
+				});
+				console.log("Razorpay instance created");
+				razorpay.open();
+				console.log("Razorpay screen opened");
+			} else {
+				console.log("data.subscriptionId does not exist");
+			}
+		} catch (err) {
+			console.error("Razorpay error", err);
+			toast.error(`Failed to initialize Razorpay: ${(err as Error).message}. Please try again.`);
+		} finally {
+			setLoading(false);
+		}
+	};
 	return (
 		<div className="flex h-full flex-col p-4">
 			{/* New Chat Button */}
@@ -60,6 +126,13 @@ const ChatSideBar = ({ chats, chatId }: Props) => {
 					Source
 				</Link>
 				{/* Optional: Add credits or logout button */}
+				<Button
+					className="mt-2 bg-slate-700 text-white"
+					disabled={loading}
+					onClick={handleSubscription}
+				>
+					Upload To Pro!
+				</Button>
 			</footer>
 		</div>
 	);
