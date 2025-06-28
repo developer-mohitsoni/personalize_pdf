@@ -1,0 +1,7 @@
+# GOOD .dockerignore example
+node_modules
+.next
+Dockerfile
+.dockerignore
+.env*
+# DO NOT include tsconfig.json or postcss.config.js
