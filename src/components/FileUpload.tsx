@@ -10,6 +10,11 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
+const baseURL =
+	process.env.NODE_ENV === "production"
+		? "https://build-ai-pdf.vercel.app/" // Replace this with your actual deployed URL
+		: "http://localhost:3000";
+
 const FileUpload = () => {
 	const router = useRouter();
 	const [uploading, setUploading] = useState(false);
@@ -18,7 +23,7 @@ const FileUpload = () => {
 			file_key,
 			file_name
 		}: { file_key: string; file_name: string }) => {
-			const response = await axios.post("/api/create-chat", {
+			const response = await axios.post(`${baseURL}/api/create-chat`, {
 				file_key,
 				file_name
 			});
