@@ -1,0 +1,26 @@
+name: GitHub AWS OIDC
+on:
+  push:
+    branches: [aws-oidc-test]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  oidc-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials for China region audience
+        uses: aws-actions/configure-aws-credentials@v4.1.0
+        with:
+          aws-region: ap-south-1
+          role-to-assume: ${{secrets.AWS_IAM_ROLE}} 
+
+      - name: Test AWS OIDC authentication
+        run: |
+          aws sts get-caller-identity
+          aws s3 ls
