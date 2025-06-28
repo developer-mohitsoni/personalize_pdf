@@ -12,7 +12,7 @@ import toast from "react-hot-toast";
 
 const baseURL =
 	process.env.NODE_ENV === "production"
-		? "https://build-ai-pdf.vercel.app/" // Replace this with your actual deployed URL
+		? "https://build-ai-pdf.vercel.app" // Replace this with your actual deployed URL
 		: "http://localhost:3000";
 
 const FileUpload = () => {
