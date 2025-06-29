@@ -4,13 +4,16 @@ services:
   nextjs-app:
     build:
       context: .
-      dockerfile: Dockerfile
-    image: yourusername/nextjs-app:latest
+      secrets:
+        - dotenv
     ports:
       - "3000:3000"
     environment:
       NODE_ENV: production
-      DATABASE_URL: ${DATABASE_URL} # from your .env file
     env_file:
       - .env
     restart: always
+
+secrets:
+  dotenv:
+    file: .env
