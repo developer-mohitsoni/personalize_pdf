@@ -16,6 +16,7 @@ COPY . .
 ENV NODE_ENV=production
 
 # Build Next.js app
+RUN rm -rf ./.next/cache
 RUN --mount=type=secret,id=dotenv,target=/app/.env npm run build
 
 # Final image to serve
