@@ -3,6 +3,8 @@ on:
   push:
     branches: [aws-oidc-test]
 
+  workflow_dispatch:
+
 permissions:
   id-token: write
   contents: read
@@ -18,7 +20,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4.1.0
         with:
           aws-region: ap-south-1
-          role-to-assume: ${{secrets.AWS_IAM_ROLE}} 
+          role-to-assume: ${{secrets.AWS_IAM_ROLE}}
 
       - name: Test AWS OIDC authentication
         run: |
