@@ -1,7 +1,34 @@
-# GOOD .dockerignore example
+# Node modules (local)
 node_modules
-.next
+
+# Logs
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# OS/System files
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Docker
 Dockerfile
 .dockerignore
+docker-compose.yml
 .env*
-# DO NOT include tsconfig.json or postcss.config.js
+!.env
+# Env files (we inject these at runtime)
+
+
+# Build artifacts (local, not needed if you build inside Docker)
+.next
+out
+dist
+
+# IDEs
+.vscode
+.idea
+*.swp

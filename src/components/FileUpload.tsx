@@ -7,14 +7,13 @@ import { useDropzone } from "react-dropzone";
 
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-
 
 const FileUpload = () => {
 	const router = useRouter();
 	const [uploading, setUploading] = useState(false);
-	const { mutate, isPending } = useMutation({
+	const { mutate, isPending, isError } = useMutation({
 		mutationFn: async ({
 			file_key,
 			file_name
@@ -27,6 +26,13 @@ const FileUpload = () => {
 			return response.data;
 		}
 	});
+
+	useEffect(() => {
+		if (isError) {
+			console.error("Error uploading file:", isError);
+		}
+	}, [isError]);
+
 	const { getRootProps, getInputProps } = useDropzone({
 		accept: {
 			"application/pdf": [".pdf"]
