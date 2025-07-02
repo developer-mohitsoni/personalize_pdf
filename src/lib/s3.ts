@@ -1,43 +1,41 @@
-import AWS from "aws-sdk";
-
+// s3-client.ts - SECURE VERSION using Pre-signed URLs
 export async function uploadToS3(file: File) {
 	try {
-		AWS.config.update({
-			accessKeyId: process.env.NEXT_PUBLIC_S3_ACCESS_KEY_ID,
-			secretAccessKey: process.env.NEXT_PUBLIC_S3_SECRET_ACCESS_KEY
-		});
-
-		const s3 = new AWS.S3({
-			params: {
-				Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME
+		// Step 1: Get pre-signed URL from your API
+		const response = await fetch("/api/s3/presigned-url", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
 			},
-			region: process.env.NEXT_PUBLIC_S3_REGION
-		});
-
-		const file_key = `uploads/${Date.now().toString()}${file.name.replace(" ", "-")}`;
-
-		const params = {
-			Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME as string,
-			Key: file_key,
-			Body: file
-		};
-
-		const upload = s3
-			.putObject(params)
-			.on("httpUploadProgress", (evt) => {
-				`${console.log(
-					"uploading to s3...",
-					Number.parseInt(((evt.loaded * 100) / evt.total).toString())
-				)}%`; // Log the progress of the upload
+			body: JSON.stringify({
+				fileName: file.name,
+				fileType: file.type
 			})
-			.promise();
-
-		await upload.then((data) => {
-			console.log("Successfully uploaded file to S3!", file_key);
 		});
+
+		if (!response.ok) {
+			throw new Error("Failed to get pre-signed URL");
+		}
+
+		const { presignedUrl, fileKey } = await response.json();
+
+		// Step 2: Upload directly to S3 using pre-signed URL
+		const uploadResponse = await fetch(presignedUrl, {
+			method: "PUT",
+			headers: {
+				"Content-Type": file.type
+			},
+			body: file
+		});
+
+		if (!uploadResponse.ok) {
+			throw new Error("Failed to upload file to S3");
+		}
+
+		console.log("Successfully uploaded file to S3!", fileKey);
 
 		return Promise.resolve({
-			file_key,
+			file_key: fileKey,
 			file_name: file.name
 		});
 	} catch (err) {
@@ -47,7 +45,8 @@ export async function uploadToS3(file: File) {
 }
 
 export function getS3URL(file_key: string) {
-	const url = `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.${process.env.NEXT_PUBLIC_S3_REGION}.amazonaws.com/${file_key}`;
-
+	const bucketName = process.env.NEXT_PUBLIC_S3_BUCKET_NAME;
+	const region = process.env.NEXT_PUBLIC_S3_REGION;
+	const url = `https://${bucketName}.s3.${region}.amazonaws.com/${file_key}`;
 	return url;
 }
