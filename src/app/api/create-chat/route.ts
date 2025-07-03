@@ -1,4 +1,4 @@
-import { db } from "@/lib/db";
+import { getDb } from "@/lib/db";
 import { chats } from "@/lib/db/schema";
 import { loadS3IntoPinecone } from "@/lib/pinecone";
 import { getS3URL } from "@/lib/s3";
@@ -6,6 +6,8 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
+	const db = getDb();
+	
 	const { userId } = await auth();
 
 	if (!userId) {

@@ -1,18 +1,16 @@
-import { db } from "@/lib/db";
+import { getDb } from "@/lib/db";
 import { userSubscriptions } from "@/lib/db/schema";
+import { getRazorpayClient } from "@/lib/razorpay";
 import { checkSubscription } from "@/lib/subscription";
 import { auth } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
-import Razorpay from "razorpay";
-
-const key_id = process.env.RAZORPAY_KEY_ID as string;
-const key_secret = process.env.RAZORPAY_KEY_SECRET as string;
-
-const razorpay = new Razorpay({ key_id, key_secret });
 
 export async function POST() {
 	try {
+		const razorpay = getRazorpayClient();
+		const db = getDb();
+
 		const { userId } = await auth();
 		if (!userId) {
 			return new NextResponse("Unauthorized", { status: 401 });

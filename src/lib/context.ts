@@ -1,11 +1,12 @@
 import { getEmbeddings } from "./embedding";
-import { pc } from "./pinecone";
+import { getPineconeClient } from "./pinecone";
 import { convertToASCII } from "./utils";
 
 export async function getMatchesFromEmbeddings(
 	embeddings: number[],
 	fileKey: string
 ) {
+	const pc = getPineconeClient();
 	const index = pc.Index(process.env.PINECONE_INDEX_NAME as string);
 
 	try {

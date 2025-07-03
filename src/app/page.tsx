@@ -1,7 +1,7 @@
 import FileUpload from "@/components/FileUpload";
 import SubscriptionButton from "@/components/SubscriptionButton";
 import { Button } from "@/components/ui/button";
-import { db } from "@/lib/db";
+import { getDb } from "@/lib/db";
 import { chats } from "@/lib/db/schema";
 import { checkSubscription } from "@/lib/subscription";
 import { UserButton } from "@clerk/nextjs";
@@ -15,6 +15,8 @@ export default async function Home() {
 	const isAuth = !!userId;
 
 	const isPro = await checkSubscription();
+
+	const db = getDb();
 
 	// biome-ignore lint/suspicious/noImplicitAnyLet: <explanation>
 	let firstChat;

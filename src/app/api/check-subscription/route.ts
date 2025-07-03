@@ -1,4 +1,4 @@
-import { db } from "@/lib/db";
+import { getDb } from "@/lib/db";
 import { userSubscriptions } from "@/lib/db/schema";
 import { checkSubscription } from "@/lib/subscription";
 import { auth } from "@clerk/nextjs/server";
@@ -7,6 +7,8 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
 	try {
+		const db = getDb();
+
 		const { userId } = await auth();
 		if (!userId) {
 			return NextResponse.json({ isPro: false, subscriptionId: null });

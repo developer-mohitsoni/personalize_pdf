@@ -1,21 +1,15 @@
 import { currentUser } from "@clerk/nextjs/server";
-import { db } from "../db";
-import { userSubscriptions } from "../db/schema";
 import { eq } from "drizzle-orm";
-import Razorpay from "razorpay";
-
-const key_id = process.env.RAZORPAY_KEY_ID as string;
-const key_secret = process.env.RAZORPAY_KEY_SECRET as string;
-
-if (!key_id || !key_secret) {
-	throw new Error("RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET must be defined");
-}
+import { getDb } from "../db";
+import { userSubscriptions } from "../db/schema";
+import { getRazorpayClient } from "../razorpay";
 
 const BASE_URL = process.env.NEXT_BASE_URL as string;
 
-const razorpay = new Razorpay({ key_id, key_secret });
-
 export async function internalHandleSubscription(userId: string) {
+	const db = getDb();
+	const razorpay = getRazorpayClient();
+
 	const user = await currentUser();
 	if (!user) throw new Error("User not found");
 
@@ -120,6 +114,6 @@ export async function internalHandleSubscription(userId: string) {
 		customerId,
 		name: "ChatPDF Pro",
 		email: userEmail,
-		key: key_id
+		key: process.env.RAZORPAY_KEY_ID,
 	};
 }

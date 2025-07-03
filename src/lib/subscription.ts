@@ -1,10 +1,12 @@
-import { eq } from "drizzle-orm";
-import { db } from "./db";
-import { userSubscriptions } from "./db/schema";
 import { auth } from "@clerk/nextjs/server";
+import { eq } from "drizzle-orm";
+import { getDb } from "./db";
+import { userSubscriptions } from "./db/schema";
 
 const DAY_IN_MS = 1000 * 60 * 60 * 24;
 export const checkSubscription = async () => {
+	const db = getDb();
+
 	const { userId } = await auth();
 	if (!userId) {
 		return false;

@@ -3,21 +3,26 @@ import {
 	Document,
 	RecursiveCharacterTextSplitter
 } from "@pinecone-database/doc-splitter";
-import {
-	Pinecone,
-	type PineconeConfiguration
-} from "@pinecone-database/pinecone";
+import { Pinecone } from "@pinecone-database/pinecone";
 import type { PineconeRecord } from "@pinecone-database/pinecone";
 import md5 from "md5";
 import { getEmbeddings } from "./embedding";
 import { downloadFromS3 } from "./s3-server";
 import { convertToASCII } from "./utils";
 
-const config: PineconeConfiguration = {
-	apiKey: process.env.PINECONE_API_KEY as string
-};
+export function getPineconeClient(): Pinecone {
+	let pc: Pinecone | null = null;
 
-export const pc = new Pinecone(config);
+	if (pc) return pc;
+
+	const apiKey = process.env.PINECONE_API_KEY;
+	if (!apiKey) {
+		throw new Error("Missing PINECONE_API_KEY");
+	}
+
+	pc = new Pinecone({ apiKey });
+	return pc;
+}
 
 type PDFPage = {
 	pageContent: string;
@@ -29,6 +34,7 @@ type PDFPage = {
 };
 
 export async function loadS3IntoPinecone(file_key: string) {
+	const pc = getPineconeClient();
 	// 1. Obtain the PDF -> Download and Read from PDF
 	console.log("Downloading S3 into file system");
 

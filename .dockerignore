@@ -19,7 +19,6 @@ Dockerfile
 .dockerignore
 docker-compose.yml
 .env*
-!.env
 # Env files (we inject these at runtime)
 
 

@@ -3,12 +3,11 @@ import { drizzle } from "drizzle-orm/neon-http";
 
 neonConfig.fetchConnectionCache = true;
 
-if (!process.env.DATABASE_URL) {
-	throw new Error("DATABASE_URL not found");
-}
+// Export a function to get the db instance on-demand
+export const getDb = () => {
+	const url = process.env.DATABASE_URL;
+	if (!url) throw new Error("DATABASE_URL not found");
 
-const sql = neon(process.env.DATABASE_URL);
-
-export const db = drizzle({
-	client: sql
-});
+	const sql = neon(url);
+	return drizzle({ client: sql });
+};

@@ -1,5 +1,5 @@
 import { getContext } from "@/lib/context";
-import { db } from "@/lib/db";
+import { getDb } from "@/lib/db";
 import { messages as _messages, chats } from "@/lib/db/schema";
 import { openai } from "@ai-sdk/openai";
 // import type { Message } from "@ai-sdk/react";
@@ -11,6 +11,8 @@ export const runtime = "nodejs";
 
 export async function POST(req: Request) {
 	try {
+		const db = getDb();
+
 		const { messages, chatId } = await req.json();
 
 		const _chats = await db.select().from(chats).where(eq(chats.id, chatId));
@@ -62,7 +64,7 @@ export async function POST(req: Request) {
 				prompt,
 				...messages.filter((message: Message) => message.role === "user")
 			],
-			onFinish: async ({text}) => {
+			onFinish: async ({ text }) => {
 				// ✅ Save assistant's response after stream completes
 				await db.insert(_messages).values({
 					chatId,

@@ -1,12 +1,14 @@
 import crypto from "node:crypto";
-import { db } from "@/lib/db";
+import { getDb } from "@/lib/db";
 import { userSubscriptions } from "@/lib/db/schema";
-import { razorpay } from "@/lib/razorpay";
+import { getRazorpayClient } from "@/lib/razorpay";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
+	const db = getDb();
+	const razorpay = getRazorpayClient();
 	const body = await req.text();
 	const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET as string;
 	const signature = (await headers()).get("x-razorpay-signature") as string;

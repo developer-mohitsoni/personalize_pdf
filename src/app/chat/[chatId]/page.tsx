@@ -1,7 +1,7 @@
 import ChatComponent from "@/components/ChatComponent";
 import ChatSideBar from "@/components/ChatSideBar";
 import PDFViewer from "@/components/PDFViewer";
-import { db } from "@/lib/db";
+import { getDb } from "@/lib/db";
 import { chats } from "@/lib/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
@@ -14,6 +14,8 @@ interface Props {
 }
 
 const ChatPdf = async (props: Props) => {
+	const db = getDb();
+
 	const { params } = props;
 	const { chatId } = params;
 
