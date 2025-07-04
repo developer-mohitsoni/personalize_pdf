@@ -2,13 +2,13 @@
 ARG VERSION=lts
 
 # Base image
-FROM node:${VERSION}-slim AS base
+FROM node:${VERSION}-alpine AS base
 WORKDIR /app
 
+RUN apk add --no-cache curl
+
 # Install only required system packages
-RUN apt-get update && apt-get install -y --no-install-recommends \
-  ca-certificates \
-  && apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache ca-certificates
 
 # Dependencies stage
 FROM base AS deps
@@ -51,6 +51,9 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 EXPOSE 3000
+
+HEALTHCHECK --interval=5s --timeout=5s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:3000/api/health || exit 1
 
 ENV HOSTNAME=0.0.0.0
 CMD ["node", "server.js"]
