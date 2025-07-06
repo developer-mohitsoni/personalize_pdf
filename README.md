@@ -102,18 +102,24 @@ This project, named "build-ai-pdf", is a Next.js application that allows users t
     CLERK_SECRET_KEY=your_clerk_secret_key
     NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
     NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+    NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/
+    NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/
+    NEXT_BASE_URL=http://localhost:3000
     DATABASE_URL=your_database_url
+    NEXT_PUBLIC_S3_BUCKET_NAME=your_bucket_name
+    NEXT_PUBLIC_S3_REGION=your_bucket_region
     PINECONE_API_KEY=your_pinecone_api_key
-    PINECONE_ENVIRONMENT=your_pinecone_environment
-    AWS_S3_BUCKET_NAME=your_aws_s3_bucket_name
-    AWS_S3_REGION=your_aws_s3_region
-    AWS_ACCESS_KEY_ID=your_aws_access_key_id
-    AWS_SECRET_ACCESS_KEY=your_aws_secret_access_key
+    PINECONE_INDEX_NAME=your_pinecone_index_name
+    S3_ACCESS_KEY_ID=your_aws_access_key_id
+    S3_SECRET_ACCESS_KEY=your_aws_secret_access_key
+    S3_BUCKET_NAME=your_aws_s3_bucket_name
+    S3_REGION=your_aws_s3_region
+    OPENAI_API_KEY=your_openai_api_key
+    RAZORPAY_KEY_ID=your_razorpay_key_id
+    PLAN_ID=your_plan_id
     RAZORPAY_KEY_ID=your_razorpay_key_id
     RAZORPAY_KEY_SECRET=your_razorpay_key_secret
-    NEXT_PUBLIC_RAZORPAY_CURRENCY=INR
-    NEXT_PUBLIC_BASE_URL=http://localhost:3000
-    OPENAI_API_KEY=your_openai_api_key
+    RAZORPAY_WEBHOOK_SECRET=your_razorpay_webhook_secret
     ```
 
 4.  Run database migrations:
@@ -132,6 +138,22 @@ yarn dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+### Running with Docker
+
+1.  **Build the Docker image:**
+
+    ```bash
+    docker build --no-cache --build-arg NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_next_public_clerk_publishable_key -t build-ai-pdf .
+    ```
+
+2.  **Run the Docker container:**
+
+    ```bash
+    docker run -e NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_next_public_clerk_publishable_key -p 3000:3000 my-app-image build-ai-pdf
+    ```
+
+    This command starts the container and maps port 3000 to your local machine. It also passes the environment variables from your `.env` file to the container.
 
 ## Contributing
 
