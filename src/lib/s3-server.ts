@@ -32,9 +32,9 @@ export async function downloadFromS3(file_key: string): Promise<string> {
 			: (response.Body as unknown as Readable); // fallback for Node <18
 
 		// Ensure tmp dir exists
-		const tmpDir = path.resolve("./tmp");
+		const tmpDir = "/tmp"; // Use /tmp for universally writable temporary files in Docker
 		if (!fs.existsSync(tmpDir)) {
-			fs.mkdirSync(tmpDir);
+			fs.mkdirSync(tmpDir, { recursive: true }); // Ensure recursive creation
 		}
 
 		const filePath = path.join(tmpDir, `pdf-${Date.now()}.pdf`);
