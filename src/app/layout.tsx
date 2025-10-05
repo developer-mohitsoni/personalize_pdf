@@ -25,7 +25,7 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<ClerkProvider afterSignOutUrl={"/"}>
+		<ClerkProvider afterSignInUrl="/" afterSignOutUrl={"/"}>
 			<Providers>
 				<html lang="en">
 					<body
